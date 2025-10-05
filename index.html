@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Добавить мой токен</title>
+    <style>
+        body { font-family: sans-serif; display: grid; place-items: center; height: 100vh; margin: 0; background-color: #222; color: white;}
+        button { font-size: 1.2rem; padding: 15px 25px; border-radius: 10px; border: none; cursor: pointer; background-color: #007bff; color: white; }
+    </style>
+</head>
+<body>
+
+    <button id="addTokenBtn">🚀 Добавить токен в MetaMask</button>
+
+    <script>
+        // --- ШАГ 1: ВСТАВЬТЕ ВАШИ ДАННЫЕ ЗДЕСЬ ---
+        const tokenAddress = '0xbb24e190C384D4845818a54E1Cf3971E6782ba09';      // АДРЕС ВАШЕГО СМАРТ-КОНТРАКТА
+        const tokenSymbol = 'USDTI';       // СИМВОЛ ВАШЕГО ТОКЕНА (например, SFL)
+        const tokenDecimals = 16;           // КОЛИЧЕСТВО ДЕСЯТИЧНЫХ ЗНАКОВ
+        const tokenImage = 'https://github.com/theycallmeibra/usdti/blob/main/usdti%20svg%20.svg';   // ПРЯМАЯ ССЫЛКА НА ВАШ ЛОГОТИП (.png или .svg)
+        // -----------------------------------------
+
+        // Обновляем текст на кнопке
+        document.getElementById('addTokenBtn').textContent = `🚀 Добавить ${tokenSymbol} в MetaMask`;
+
+        // Обработчик нажатия на кнопку
+        document.getElementById('addTokenBtn').addEventListener('click', async () => {
+            if (typeof window.ethereum === 'undefined') {
+                alert('Пожалуйста, установите MetaMask!');
+                return;
+            }
+
+            try {
+                // Запрос к MetaMask на добавление токена
+                const wasAdded = await window.ethereum.request({
+                    method: 'wallet_watchAsset',
+                    params: {
+                        type: 'BEP20', // Стандарт токена
+                        options: {
+                            address: tokenAddress,
+                            symbol: tokenSymbol,
+                            decimals: tokenDecimals,
+                            image: tokenImage,
+                        },
+                    },
+                });
+
+                if (wasAdded) {
+                    alert('Токен успешно добавлен!');
+                } else {
+                    alert('Вы отклонили добавление токена.');
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('Произошла ошибка при добавлении токена.');
+            }
+        });
+    </script>
+
+</body>
+</html>
