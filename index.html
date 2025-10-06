@@ -5,38 +5,64 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Добавить мой токен</title>
     <style>
-        body { font-family: sans-serif; display: grid; place-items: center; height: 100vh; margin: 0; background-color: #222; color: white;}
-        button { font-size: 1.2rem; padding: 15px 25px; border-radius: 10px; border: none; cursor: pointer; background-color: #007bff; color: white; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; display: grid; place-items: center; text-align: center; height: 100vh; margin: 0; background-color: #1a1a1a; color: white;}
+        .container { padding: 20px; }
+        button { font-size: 1.2rem; font-weight: bold; padding: 15px 25px; border-radius: 12px; border: none; cursor: pointer; background-color: #0d6efd; color: white; transition: background-color 0.2s; }
+        button:hover { background-color: #0b5ed7; }
     </style>
 </head>
 <body>
 
-    <button id="addTokenBtn">🚀 Добавить токен в MetaMask</button>
+    <div class="container">
+        <h1>Проект Flash USDT</h1>
+        <p>Нажмите кнопку ниже, чтобы добавить токен USDTI в ваш кошелек MetaMask.</p>
+        <button id="addTokenBtn">🚀 Добавить токен в MetaMask</button>
+    </div>
 
     <script>
-        // --- ШАГ 1: ВСТАВЬТЕ ВАШИ ДАННЫЕ ЗДЕСЬ ---
-        const tokenAddress = '0xbb24e190C384D4845818a54E1Cf3971E6782ba09';      // АДРЕС ВАШЕГО СМАРТ-КОНТРАКТА
-        const tokenSymbol = 'USDTI';       // СИМВОЛ ВАШЕГО ТОКЕНА (например, SFL)
-        const tokenDecimals = 6;           // КОЛИЧЕСТВО ДЕСЯТИЧНЫХ ЗНАКОВ
-        const tokenImage = 'https://raw.githubusercontent.com/theycallmeibra/usdti/7864c8383fa9189ab497d40c45b98e8f3cde836c/usdti%20svg%20.svg';   // ПРЯМАЯ ССЫЛКА НА ВАШ ЛОГОТИП (.png или .svg)
+        // --- ШАГ 1: ВАШИ ДАННЫЕ ---
+        // Убедитесь, что все данные верны
+        const tokenAddress = '0xbb24e190C384D4845818a54E1Cf3971E6782ba09';
+        const tokenSymbol = 'USDTI';
+        const tokenDecimals = 6; // В вашем коде было 16, но для USDT-подобных токенов обычно 6. Проверьте ваш контракт.
+        // ВАЖНО: Убедитесь, что в имени файла нет пробелов! Я исправил ссылку для примера.
+        const tokenImage = 'https://github.com/theycallmeibra/usdti/blob/main/svg.svg'; 
         // -----------------------------------------
 
         // Обновляем текст на кнопке
-        document.getElementById('addTokenBtn').textContent = `🚀 Добавить ${tokenSymbol} в MetaMask UPD`;
+        document.getElementById('addTokenBtn').textContent = `🚀 Добавить ${tokenSymbol} в MetaMask`;
 
         // Обработчик нажатия на кнопку
-        document.getElementById('addTokenBtn').addEventListener('click', async () => {
+        document.getElementById('addTokenBtn').addEventListener('click', () => {
+            // Проверяем, есть ли MetaMask (расширение на ПК или в мобильном приложении)
             if (typeof window.ethereum === 'undefined') {
-                alert('Пожалуйста, установите MetaMask!');
+                // MetaMask не установлен или мы в обычном мобильном браузере
+
+                // Проверяем, мобильное ли это устройство
+                const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+                if (isMobile) {
+                    // Формируем глубокую ссылку, чтобы открыть текущую страницу в браузере MetaMask
+                    const deepLink = `https://metamask.app.link/dapp/${window.location.host}${window.location.pathname}`;
+                    window.location.href = deepLink;
+                } else {
+                    // Это компьютер без MetaMask
+                    alert('Пожалуйста, установите расширение MetaMask для вашего браузера!');
+                }
                 return;
             }
 
+            // Если MetaMask есть, выполняем стандартный запрос
+            addTokenAsset();
+        });
+
+        async function addTokenAsset() {
             try {
-                // Запрос к MetaMask на добавление токена
                 const wasAdded = await window.ethereum.request({
                     method: 'wallet_watchAsset',
                     params: {
-                        type: 'BEP20', // Стандарт токена
+                        // 'BEP20' не является стандартным типом, используется 'ERC20'
+                        // так как BEP-20 полностью с ним совместим.
+                        type: 'ERC20', 
                         options: {
                             address: tokenAddress,
                             symbol: tokenSymbol,
@@ -55,7 +81,7 @@
                 console.error('Ошибка:', error);
                 alert('Произошла ошибка при добавлении токена.');
             }
-        });
+        }
     </script>
 
 </body>
